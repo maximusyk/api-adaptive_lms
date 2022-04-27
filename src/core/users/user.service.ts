@@ -3,10 +3,10 @@ import bcrypt from 'bcrypt';
 import { Class } from '../classes/class.model';
 
 import jwt from 'jsonwebtoken';
-import config from 'config';
+import 'dotenv/config';
 import { IUser } from '../../types';
 
-const jwtSecret = config.get('jwt') as string;
+const jwtSecret = process.env.JWT_SECRET_KEY;
 
 interface IUserService {
     login: {
@@ -86,9 +86,7 @@ class UserService {
     }
 
     async getOne({ userData: { _id } }: IUserService['create']) {
-        const user = await User.findOne({
-            _id,
-        }).exec();
+        const user = await User.findById(_id).exec();
 
         if ( !user ) {
             return { status: 404, body: { messaage: 'User does not exist' } };

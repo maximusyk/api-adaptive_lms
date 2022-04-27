@@ -1,8 +1,8 @@
-import config from 'config';
 import consola from 'consola';
 import mongoose from 'mongoose';
+import 'dotenv/config'
 
-const mongoURI = config.get('mongoURI') as string;
+const mongoURI: string = process.env.MONGODB_URI as string
 
 export default () => {
   return mongoose

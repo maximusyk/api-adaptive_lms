@@ -1,13 +1,14 @@
 import { Router } from 'express';
 
-import { create, getAll, getOne, remove, update } from './chapters.controller';
-import { upload } from 'middleware/upload.middleware';
+import UnitController from './unit.controller'
+
+const { create, getAll, getOne, remove, update } = UnitController;
 
 const router = Router();
 
-router.post('/', upload.single('content'), create);
+router.post('/', create);
 router.get('/:id', getOne);
-router.patch('/:id', upload.single('content'), update);
+router.patch('/:id', update);
 router.delete('/:id', remove);
 router.get('/', getAll);
 

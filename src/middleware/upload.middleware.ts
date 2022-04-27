@@ -1,12 +1,12 @@
-import config from 'config';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 import multer from 'multer';
 import path from 'path';
 import { GridFsStorage } from 'multer-gridfs-storage';
 import Grid from 'gridfs-stream';
+import 'dotenv/config'
 
-const mongoURI: string = config.get('mongoURI');
+const mongoURI: string = process.env.MONGODB_URI as string;
 
 const conn = mongoose.createConnection(mongoURI);
 

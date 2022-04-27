@@ -1,14 +1,13 @@
 import { Router } from 'express';
 
 import ChapterController from './chapter.controller';
-import { upload } from 'middleware/upload.middleware';
 
 const router = Router();
 const { create, getAll, getOne, remove, update } = ChapterController;
 
-router.post('/', upload.single('content'), create);
+router.post('/', create);
 router.get('/:id', getOne);
-router.patch('/:id', upload.single('content'), update);
+router.patch('/:id', update);
 router.delete('/:id', remove);
 router.get('/', getAll);
 
