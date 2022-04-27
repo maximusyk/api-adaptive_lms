@@ -1,33 +1,35 @@
-import { IChapter, ICourse, ILecture, IUnit } from '../../types'
-import { Request, Response } from 'express';
+import { IChapter, ICourse, IUnit } from '../../types';
 import { Lecture } from './lecture.model';
 import { Unit } from '../units/unit.model';
 import { Chapter } from '../chapters/chapter.model';
-import errorHandler from '../../utils/errorHandler';
 import mongoose from 'mongoose';
+import { GridFSBucket } from 'mongodb';
+import 'dotenv/config';
+
+const mongoURI: string = process.env.MONGODB_URI as string;
+
+const conn = mongoose.createConnection(mongoURI);
+
+let gfs: GridFSBucket;
+
+conn.once('open', () => {
+    gfs = new mongoose.mongo.GridFSBucket(conn.db, {
+        bucketName: 'lectures'
+    });
+});
 
 interface ILectureArgs {
     id?: string;
     title: string;
-    content: { id: string };
+    fileId: string;
     chapter: IChapter['_id'];
     course: ICourse['_id'];
     units: string;
 }
 
-interface ILectureService {
-    create(data: ILectureArgs): Promise<{
-        status: number, body: ILecture | { message: string }
-    }>;
-
-    update(data: ILectureArgs): Promise<{
-        status: number, body: ILecture | { message: string }
-    }>;
-}
-
-class LectureService implements ILectureService {
-    async create(data: ILectureArgs): Promise<{ status: number, body: ILecture | { message: string } }> {
-        const { title, content: { id: fileId }, chapter, course, units } = data;
+class LectureService {
+    async create(data: ILectureArgs) {
+        const { title, fileId, chapter, course, units } = data;
 
         const candidate = await Lecture.findOne({ title }).exec();
         if ( candidate ) {
@@ -61,12 +63,11 @@ class LectureService implements ILectureService {
     }
 
     async update(data: ILectureArgs) {
+        const { id, fileId, units, ...lectureValues } = data;
         const lecture = await Lecture.findById(id).exec();
         if ( !lecture ) {
             return { status: 404, body: { message: 'Provided lecture doesn\'t exists.' } };
         }
-
-        const { units, ...lectureValues } = data;
 
         if ( JSON.parse(units)?.length ) {
             const existedUnits = await Unit.find({ course: lectureValues.course }).exec();
@@ -98,7 +99,7 @@ class LectureService implements ILectureService {
         if ( fileId ) {
             gfs.delete(new mongoose.Types.ObjectId(lecture.content), (err) => {
                 if ( err ) {
-                    return res.status(500).json({ message: 'Chapter deletion error', err: err });
+                    return { status: 500, body: { message: 'Chapter deletion error.' } };
                 }
             });
             lecture.content = fileId;
@@ -109,9 +110,9 @@ class LectureService implements ILectureService {
 
         await lecture.save();
 
-        gfs.find({ _id: fileId || new mongoose.Types.ObjectId(lecture.content) }).toArray((err, files) => {
+        gfs.find({ _id: new mongoose.Types.ObjectId(lecture.content) }).toArray((err, files) => {
             if ( !files || files.length === 0 ) {
-                return res.status(400).json({ msg: 'No files found.' });
+                return { status: 400, body: { message: 'File not found' } };
             }
             const fileStream = gfs.openDownloadStream(fileId);
             let responseFile: Uint8Array[] = [];
@@ -120,66 +121,57 @@ class LectureService implements ILectureService {
             });
 
             fileStream.on('error', () => {
-                return res.sendStatus(404);
+                return { status: 404, body: { message: 'File not found' } };
             });
 
             fileStream.on('end', () => {
                 //@ts-ignore
-                return res.status(200).json({ ...lecture._doc, content: Buffer.concat(responseFile) });
+                return {
+                    status: 200,
+                    body: {
+                        ...lecture, content: Buffer.concat(responseFile)
+                    }
+                };
             });
         });
     }
 
-    async getAll(req: Request, res: Response) {
-        try {
-            const lectures = await Lecture.find().exec();
+    async getAll() {
+        const lectures = await Lecture.find().exec();
 
-            return res.status(200).json(lectures);
-        } catch ( error ) {
-            errorHandler(res, error);
-        }
+        return { status: 200, body: lectures };
     }
 
-    async getOne({ params: { id } }: Request, res: Response) {
-        try {
-            const lectures = await Lecture.findById(id).exec();
+    async getOne({ id }: { id: string }) {
+        const lecture = await Lecture.findById(id).exec();
 
-            return res.status(200).json(lectures);
-        } catch ( error ) {
-            errorHandler(res, error);
-        }
+        return { status: 200, body: lecture };
     }
 
-    async remove({ params: { id } }: Request, res: Response) {
-        try {
-            const lecture = await Lecture.findById(id).exec();
-            if ( !lecture ) {
-                return res.status(404).json({
-                    message: 'Provided lecture doesn\'t exists.'
-                });
-            }
-
-            gfs.delete(new mongoose.Types.ObjectId(lecture.content), (err) => {
-                if ( err ) {
-                    return res.status(500).json({ message: 'Lecture deletion error', err: err });
-                }
-            });
-
-            await lecture.remove();
-            const updatedChapter = await Chapter.findOneAndUpdate({ subdivisions: { item: lecture.id } }, {
-                $pullAll: { subdivisions: { item: lecture.id } }
-            }, {
-                new: true
-            }).exec();
-
-            if ( updatedChapter ) {
-                await Unit.remove({ chapter: updatedChapter._id }).exec();
-            }
-
-            return res.status(200).json({ success: true });
-        } catch ( error ) {
-            errorHandler(res, error);
+    async remove({ id }: { id: string }) {
+        const lecture = await Lecture.findById(id).exec();
+        if ( !lecture ) {
+            return { status: 404, body: { message: 'Provided lecture doesn\'t exists.' } };
         }
+
+        gfs.delete(new mongoose.Types.ObjectId(lecture.content), (err) => {
+            if ( err ) {
+                return { status: 500, body: { message: 'Lecture deletion error' } };
+            }
+        });
+
+        await lecture.remove();
+        const updatedChapter = await Chapter.findOneAndUpdate({ subdivisions: { item: lecture.id } }, {
+            $pullAll: { subdivisions: { item: lecture.id } }
+        }, {
+            new: true
+        }).exec();
+
+        if ( updatedChapter ) {
+            await Unit.remove({ chapter: updatedChapter._id }).exec();
+        }
+
+        return { status: 200, body: { success: true } };
     }
 }
 

@@ -1,11 +1,7 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import bcrypt from 'bcrypt';
-import randomColor from 'randomcolor';
-
-import { User } from './user.model'
-import { Class } from '../classes/class.model'
 import errorHandler from '../../utils/errorHandler';
+
 import UserService from './user.service';
 
 class UserController {

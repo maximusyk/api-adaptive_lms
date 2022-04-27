@@ -1,4 +1,4 @@
-import config from 'config';
+import 'dotenv/config';
 import consola from 'consola';
 import { JwtPayload } from 'jsonwebtoken';
 import mongoose from 'mongoose';
@@ -9,7 +9,7 @@ import {
 
 import { User } from '../core/users/user.model';
 
-const jwt = config.get('jwt') as string;
+const jwt = process.env.JWT_SECRET_KEY as string;
 
 const options: StrategyOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

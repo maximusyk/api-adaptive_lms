@@ -3,53 +3,15 @@ import { Unit } from './unit.model'
 import { Keyword } from '../keywords/keyword.model'
 import { Chapter } from '../chapters/chapter.model'
 import errorHandler from '../../utils/errorHandler';
+import UnitService from './unit.service';
 
 class UnitController {
 
     async create(req: Request, res: Response) {
         try {
-            const candidate = await Unit.findOne({ title: req.body.title }).exec();
+            const result = await UnitService.create(req.body);
 
-            if ( candidate ) {
-                return res.status(409).json({
-                    message: 'Current unit already exists.'
-                });
-            }
-
-            const existedKeywords = await Keyword.find({
-                title: {
-                    $in: req.body.keywords
-                }
-            }).exec();
-
-            const newKeywords = await Keyword.insertMany(
-                req.body.keywords
-                   .filter(
-                       (item: any) =>
-                           !existedKeywords.map(({ title }) => title).includes(item)
-                   )
-                   .map((item: any) => ({ title: item }))
-            );
-
-            const unit = new Unit({
-                title: req.body.title,
-                chapter: req.body.chapter,
-                content: req.body.content,
-                keywords: newKeywords
-                .map((item) => item._id)
-                .concat(existedKeywords.map((item) => item._id))
-            });
-
-            await Chapter.findByIdAndUpdate(
-                req.body.chapter,
-                {
-                    $push: { units: unit._id }
-                },
-                { new: true }
-            ).exec();
-
-            await unit.save();
-            return res.status(201).json(unit);
+            return res.status(result.status).json(result.body);
         } catch ( error ) {
             errorHandler(res, error);
         }
@@ -57,35 +19,9 @@ class UnitController {
 
     async update(req: Request, res: Response) {
         try {
-            const reqBody = (({ _id, chapter, ...obj }) => obj)(req.body); // Copy object exclude _id and chapter
-            const existedKeywords = await Keyword.find({
-                title: {
-                    $in: reqBody.keywords
-                }
-            }).exec();
+            const result = await UnitService.update({ _id: req.params.id, ...req.body });
 
-            const newKeywords = await Keyword.insertMany(
-                reqBody.keywords
-                       .filter(
-                           (item: any) =>
-                               !existedKeywords.map(({ title }) => title).includes(item)
-                       )
-                       .map((item: any) => ({ title: item }))
-            );
-
-            const unit = await Unit.findByIdAndUpdate(
-                req.params.id,
-                {
-                    $set: {
-                        ...reqBody, keywords: newKeywords
-                        .map((item) => item._id)
-                        .concat(existedKeywords.map((item) => item._id))
-                    }
-                },
-                { new: true }
-            ).populate('keywords').exec();
-
-            return res.status(200).json(unit);
+            return res.status(result.status).json(result.body);
         } catch ( error ) {
             errorHandler(res, error);
         }
@@ -93,9 +29,19 @@ class UnitController {
 
     async getAll(req: Request, res: Response) {
         try {
-            const units = await Unit.find().exec();
+            const result = await UnitService.getAll();
 
-            return res.status(200).json(units);
+            return res.status(result.status).json(result.body);
+        } catch ( error ) {
+            errorHandler(res, error);
+        }
+    }
+
+    async getByLecture(req: Request, res: Response) {
+        try {
+            const result = await UnitService.getByLecture({ _id: req.params.id });
+
+            return res.status(result.status).json(result.body);
         } catch ( error ) {
             errorHandler(res, error);
         }
@@ -103,9 +49,9 @@ class UnitController {
 
     async getOne(req: Request, res: Response) {
         try {
-            const units = await Unit.find({ chapter: req.params.id }).exec();
+            const result = await UnitService.getOne({ _id: req.params.id });
 
-            return res.status(200).json(units);
+            return res.status(result.status).json(result.body);
         } catch ( error ) {
             errorHandler(res, error);
         }
@@ -113,20 +59,9 @@ class UnitController {
 
     async remove(req: Request, res: Response) {
         try {
-            const unit = await Unit.findByIdAndDelete(req.params.id).exec();
+            const result = await UnitService.remove({ _id: req.params.id });
 
-            if ( !unit ) {
-                return res.status(404).json({ msg: 'This unit no longer exist' });
-            }
-
-            await Chapter.findOneAndUpdate(
-                { units: unit._id },
-                {
-                    $pullAll: { units: [unit._id] }
-                }
-            ).exec();
-
-            return res.status(200).json({ success: true });
+            return res.status(result.status).json(result.body);
         } catch ( error ) {
             errorHandler(res, error);
         }
