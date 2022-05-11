@@ -19,14 +19,19 @@ const LectureSchema: Schema = new Schema({
         type: Boolean,
         default: false,
     },
+    chapter: {
+        type: Types.ObjectId,
+        ref: 'chapters',
+    },
 });
 
-LectureSchema.pre('remove', function (next) {
+LectureSchema.pre(/(?i)(remove)|(delete)/, function (next) {
     this.model('chapters').update(
         { $in: { subdivisions: { item: this._id } } },
         { $pull: { subdivisions: { item: this._id } } },
         { multi: true },
     );
+    this.model('units').deleteMany({ chapter: this.chapter });
     next();
 });
 

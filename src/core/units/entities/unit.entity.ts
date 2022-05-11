@@ -1,5 +1,5 @@
 import { model, Model, Schema, Types } from 'mongoose';
-import { IUnit } from '../../types';
+import { IUnit } from '../../../types';
 
 const UnitSchema: Schema = new Schema({
     title: {
@@ -35,7 +35,7 @@ const UnitSchema: Schema = new Schema({
     ],
 });
 
-UnitSchema.pre('remove', function (next) {
+UnitSchema.pre(/(?i)(remove)|(delete)/, function (next) {
     this.model('units').update(
         { $in: { connectivity: { unit: this._id } } },
         { $pull: { connectivity: { unit: this._id } } },

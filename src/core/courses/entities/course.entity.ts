@@ -32,6 +32,17 @@ const CourseSchema: Schema = new Schema({
 });
 
 CourseSchema.pre(/(?i)(remove)|(delete)/, function (next) {
+    this.model('chapters').deleteMany({ course: this._id });
+    this.model('class').update(
+        { course: this._id },
+        { $pull: { courses: this._id } },
+        { multi: true },
+    );
+    this.model('users').update(
+        { $in: { progress: { course: this._id } } },
+        { $pull: { progress: { course: this._id } } },
+        { multi: true },
+    );
     next();
 });
 

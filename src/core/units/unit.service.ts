@@ -1,6 +1,6 @@
 import { Chapter } from '../chapters/entities/chapter.entity';
 import { Keyword } from '../keywords/entities/keyword.entity';
-import { Unit } from './unit.entity';
+import { Unit } from './entities/unit.entity';
 
 interface IUnitServiceArgs {
     _id: string;

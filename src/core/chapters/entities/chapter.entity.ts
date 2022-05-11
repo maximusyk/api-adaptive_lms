@@ -28,4 +28,14 @@ const ChapterSchema: Schema = new Schema(
     { strict: false },
 );
 
+ChapterSchema.pre(/(?i)(remove)|(delete)/, function (next) {
+    this.model('courses').update(
+        { $in: { chapters: this._id } },
+        { $pull: { chapters: this._id } },
+    );
+    this.model('lectures').deleteMany({ chapter: this._id });
+    this.model('tests').deleteMany({ chapter: this._id });
+    next();
+});
+
 export const Chapter: Model<IChapter> = model('chapters', ChapterSchema);

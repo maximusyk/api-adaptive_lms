@@ -4,7 +4,7 @@ import 'dotenv/config';
 import { JSDOM } from 'jsdom';
 import mammoth from 'mammoth';
 import { Chapter } from '../chapters/entities/chapter.entity';
-import { Unit } from '../units/unit.entity';
+import { Unit } from '../units/entities/unit.entity';
 import { Lecture } from './entities/lecture.entity';
 
 interface ILectureArgs {
