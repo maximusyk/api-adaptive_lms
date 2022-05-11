@@ -1,10 +1,10 @@
-import { Class } from './class.model';
-import { Course } from '../courses/course.model';
-import { User } from '../users/user.model';
-import { IUser, ICourse, IClass } from '../../types';
+import { IClass, ICourse, IUser } from '../../types';
+import { Course } from '../courses/entities/course.entity';
+import { User } from '../users/entities/user.entity';
+import { Class } from './entities/class.entity';
 
 interface IStudent extends IUser {
-    role: 'student'
+    role: 'student';
 }
 
 interface IClassService {
@@ -12,23 +12,23 @@ interface IClassService {
         title: string;
         students: IStudent[];
         courses: ICourse[];
-    },
+    };
     update: {
         id: string;
         data: IClass;
-    },
+    };
     getOne: {
         id: string;
-    }
+    };
 }
 
 class ClassService {
     async create({ title, students, courses }: IClassService['create']) {
         const candidate = await Class.findOne({ title }).exec();
-        if ( candidate ) {
+        if (candidate) {
             return {
                 status: 409,
-                body: { message: 'Current class name busy.' }
+                body: { message: 'Current class name busy.' },
             };
         }
 
@@ -37,23 +37,23 @@ class ClassService {
         await Course.updateMany(
             {
                 _id: {
-                    $in: newClass.courses.map((student) => student._id)
-                }
+                    $in: newClass.courses.map((student) => student._id),
+                },
             },
             {
-                $push: { courses: newClass._id }
-            }
+                $push: { courses: newClass._id },
+            },
         ).exec();
 
         await User.updateMany(
             {
                 _id: {
-                    $in: newClass.students.map((student) => student._id)
-                }
+                    $in: newClass.students.map((student) => student._id),
+                },
             },
             {
-                class: newClass._id
-            }
+                class: newClass._id,
+            },
         ).exec();
 
         await newClass.save();
@@ -65,20 +65,20 @@ class ClassService {
         const candidate = await Class.findByIdAndUpdate(
             id,
             { $set: data },
-            { new: true }
+            { new: true },
         ).exec();
 
-        if ( !candidate ) {
+        if (!candidate) {
             return { status: 404, body: { msg: 'Class does not exist' } };
         }
 
         await Course.updateMany(
             { _id: { $in: candidate.courses.map((student) => student._id) } },
-            { $push: { courses: candidate._id } }
+            { $push: { courses: candidate._id } },
         ).exec();
         await User.updateMany(
             { _id: { $in: candidate.students.map((student) => student._id) } },
-            { $push: { students: candidate._id } }
+            { $push: { students: candidate._id } },
         ).exec();
 
         return { status: 200, body: candidate };
@@ -87,21 +87,31 @@ class ClassService {
     async getAll() {
         const classes = await Class.find().exec();
 
-        return { status: 200, body: classes }
+        return { status: 200, body: classes };
     }
 
     async getOne({ id }: IClassService['getOne']) {
         const candidate = await Class.findOne({ _id: id })
-                                     .populate('students').exec();
-        if ( !candidate ) {
+            .populate('students')
+            .exec();
+        if (!candidate) {
             return { status: 404, body: { message: 'Class does not exist' } };
         }
         return { status: 200, body: candidate };
     }
 
     async remove({ id }: IClassService['getOne']) {
-        await Class.deleteOne({ _id: id }).exec();
-        return { status: 200, body: { success: true } }
+        const candidate = await Class.findById(id).exec();
+        if (!candidate) {
+            return {
+                status: 404,
+                body: { message: 'Provided class doesn`t exists' },
+            };
+        }
+
+        await candidate.remove();
+
+        return { status: 200, body: { success: true } };
     }
 }
 

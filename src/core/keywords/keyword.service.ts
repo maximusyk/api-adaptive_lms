@@ -1,5 +1,4 @@
-import { Unit } from '../units/unit.model';
-import { Keyword } from './keyword.model';
+import { Keyword } from './entities/keyword.entity';
 
 interface IKeywordService {
     id?: string;
@@ -13,8 +12,11 @@ class KeywordService {
     async create({ title }: IKeywordService) {
         const candidate = await Keyword.findOne({ title }).exec();
 
-        if ( candidate ) {
-            return { status: 409, body: { message: 'Current keyword already exists.' } }
+        if (candidate) {
+            return {
+                status: 409,
+                body: { message: 'Current keyword already exists.' },
+            };
         }
 
         const keyword = new Keyword({
@@ -30,9 +32,9 @@ class KeywordService {
         const keyword = await Keyword.findByIdAndUpdate(
             id,
             {
-                $set: { ...keywordData }
+                $set: { ...keywordData },
             },
-            { new: true }
+            { new: true },
         ).exec();
 
         return { status: 200, body: keyword };
@@ -51,18 +53,15 @@ class KeywordService {
     }
 
     async remove({ id }: IKeywordService) {
-        const keyword = await Keyword.findByIdAndDelete(id).exec();
-
-        if ( !keyword ) {
-            return { status: 404, body: { message: 'This keyword no longer exist' } };
+        const candidate = await Keyword.findById(id).exec();
+        if (!candidate) {
+            return {
+                status: 404,
+                body: { message: 'Provided keyword doesn`t exists' },
+            };
         }
 
-        await Unit.findOneAndUpdate(
-            { keywords: keyword._id },
-            {
-                $pullAll: { keywords: [keyword._id] }
-            }
-        ).exec();
+        await candidate.remove();
 
         return { status: 200, body: { success: true } };
     }

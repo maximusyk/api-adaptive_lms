@@ -1,35 +1,49 @@
 import { Request, Response } from 'express';
+import { Readable } from 'stream';
+
 import errorHandler from '../../utils/errorHandler';
 import LectureService from './lecture.service';
 
 class LectureController {
-    async create(req: Request, res: Response) {
+    async create({ body, files }: Request, res: Response) {
         try {
-            const result = await LectureService.create({ ...req.body, content: req.file });
+            const result = await LectureService.create({
+                ...body,
+                content: files as Express.Multer.File[],
+            });
 
             return res.status(result.status).json(result.body);
-        } catch ( error ) {
+        } catch (error) {
             errorHandler(res, error);
         }
     }
 
-    async update(req: Request, res: Response) {
+    async update({ body, params }: Request, res: Response) {
         try {
-            //@ts-ignore
-            const result = await LectureService.update({ ...req.body, id: req.params.id, file: req.file.id });
+            const result = await LectureService.update({
+                ...body,
+                id: params.id,
+            });
 
             return res.status(result.status).json(result.body);
-        } catch ( error ) {
+        } catch (error) {
             errorHandler(res, error);
         }
     }
 
-    async getAll(req: Request, res: Response) {
+    async editLecture({ params: { id }, files }: Request, res: Response) {
         try {
-            const result = await LectureService.getAll();
+            const result = await LectureService.editLecture({
+                id,
+                content: files as Express.Multer.File[],
+            });
+
+            if (result instanceof Readable) {
+                return result.pipe(res);
+            }
 
             return res.status(result.status).json(result.body);
-        } catch ( error ) {
+        } catch (error) {
             errorHandler(res, error);
         }
     }
@@ -39,17 +53,37 @@ class LectureController {
             const result = await LectureService.getOne({ id });
 
             return res.status(result.status).json(result.body);
-        } catch ( error ) {
+        } catch (error) {
+            errorHandler(res, error);
+        }
+    }
+
+    async readLecture({ params: { id } }: Request, res: Response) {
+        try {
+            const result = await LectureService.readLecture(id);
+
+            return result.pipe(res);
+        } catch (error) {
+            errorHandler(res, error);
+        }
+    }
+
+    async getAll(_req: Request, res: Response) {
+        try {
+            const result = await LectureService.getAll();
+
+            return res.status(result.status).json(result.body);
+        } catch (error) {
             errorHandler(res, error);
         }
     }
 
     async remove({ params: { id } }: Request, res: Response) {
         try {
-            const result = await LectureService.remove({ id });
+            const result = await LectureService.remove(id);
 
             return res.status(result.status).json(result.body);
-        } catch ( error ) {
+        } catch (error) {
             errorHandler(res, error);
         }
     }

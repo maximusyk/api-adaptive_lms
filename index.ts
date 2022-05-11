@@ -3,8 +3,10 @@ import consola from 'consola';
 import app from './src/app';
 import connectMongo from './src/db';
 
-app.listen(5000, () => {
-  consola.success('Server has been started on 5000');
+const PORT = process.env.API_PORT || 5000;
 
-  connectMongo();
+app.listen(PORT, () => {
+    consola.success(`Server has been started on ${PORT}`);
+
+    connectMongo();
 });

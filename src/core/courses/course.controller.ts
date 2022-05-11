@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+
 import errorHandler from '../../utils/errorHandler';
 import CourseService from './course.service';
 
@@ -35,7 +36,7 @@ class CourseController {
 
     async getOne(req: Request, res: Response) {
         try {
-            const result = await CourseService.update({ id: req.params.id });
+            const result = await CourseService.getOne({ id: req.params.id });
 
             return res.status(result.status).json(result.body);
         } catch ( error ) {

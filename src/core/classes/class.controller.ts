@@ -15,7 +15,7 @@ class ClassController {
 
     async update(req: Request, res: Response) {
         try {
-            const result = await ClassService.update({ id: req.params.id, data: req.body })
+            const result = await ClassService.update({ id: req.params.id, data: req.body });
 
             return res.status(result.status).json(result.body);
         } catch ( error ) {

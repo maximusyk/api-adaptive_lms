@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import UnitController from './unit.controller'
+import UnitController from './unit.controller';
 
 const { create, getAll, getOne, remove, update } = UnitController;
 

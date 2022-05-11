@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import KeywordService from './keyword.service'
+import KeywordService from './keyword.service';
 import errorHandler from '../../utils/errorHandler';
 
 class KeywordController {

@@ -1,38 +1,41 @@
-import { Request, Response } from 'express';
-import { Unit } from './unit.model';
-import { Keyword } from '../keywords/keyword.model';
-import { Chapter } from '../chapters/chapter.model';
-import { IKeyword } from '../../types';
+import { Chapter } from '../chapters/entities/chapter.entity';
+import { Keyword } from '../keywords/entities/keyword.entity';
+import { Unit } from './unit.entity';
 
 interface IUnitServiceArgs {
     _id: string;
     title: string;
     chapter: string;
     content: string;
-    keywords: IKeyword[];
+    keywords: string[];
 }
 
 class UnitService {
     async create(data: IUnitServiceArgs) {
         const candidate = await Unit.findOne({ title: data.title }).exec();
 
-        if ( candidate ) {
-            return { status: 409, body: { message: 'Current unit already exists.' } };
+        if (candidate) {
+            return {
+                status: 409,
+                body: { message: 'Current unit already exists.' },
+            };
         }
 
         const existedKeywords = await Keyword.find({
             title: {
-                $in: data.keywords
-            }
+                $in: data.keywords,
+            },
         }).exec();
 
         const newKeywords = await Keyword.insertMany(
             data.keywords
                 .filter(
-                    (item: any) =>
-                        !existedKeywords.map(({ title }) => title).includes(item)
+                    (item) =>
+                        !existedKeywords
+                            .map(({ title }) => title)
+                            .includes(item),
                 )
-                .map((item: any) => ({ title: item }))
+                .map((item) => ({ title: item })),
         );
 
         const unit = new Unit({
@@ -40,16 +43,16 @@ class UnitService {
             chapter: data.chapter,
             content: data.content,
             keywords: newKeywords
-            .map((item) => item._id)
-            .concat(existedKeywords.map((item) => item._id))
+                .map((item) => item._id)
+                .concat(existedKeywords.map((item) => item._id)),
         });
 
         await Chapter.findByIdAndUpdate(
             data.chapter,
             {
-                $push: { units: unit._id }
+                $push: { units: unit._id },
             },
-            { new: true }
+            { new: true },
         ).exec();
 
         await unit.save();
@@ -57,33 +60,37 @@ class UnitService {
     }
 
     async update(data: IUnitServiceArgs) {
-        const reqBody = (({ _id, chapter, ...obj }) => obj)(data); // Copy object exclude _id and chapter
         const existedKeywords = await Keyword.find({
             title: {
-                $in: reqBody.keywords
-            }
+                $in: data.keywords,
+            },
         }).exec();
 
         const newKeywords = await Keyword.insertMany(
-            reqBody.keywords
-                   .filter(
-                       (item: any) =>
-                           !existedKeywords.map(({ title }) => title).includes(item)
-                   )
-                   .map((item: any) => ({ title: item }))
+            data.keywords
+                .filter(
+                    (item) =>
+                        !existedKeywords
+                            .map(({ title }) => title)
+                            .includes(item),
+                )
+                .map((item) => ({ title: item })),
         );
 
         const unit = await Unit.findByIdAndUpdate(
             data._id,
             {
                 $set: {
-                    ...reqBody, keywords: newKeywords
-                    .map((item) => item._id)
-                    .concat(existedKeywords.map((item) => item._id))
-                }
+                    ...data,
+                    keywords: newKeywords
+                        .map((item) => item._id)
+                        .concat(existedKeywords.map((item) => item._id)),
+                },
             },
-            { new: true }
-        ).populate('keywords').exec();
+            { new: true },
+        )
+            .populate('keywords')
+            .exec();
 
         return { status: 200, body: unit };
     }
@@ -107,18 +114,15 @@ class UnitService {
     }
 
     async remove({ _id }: Partial<IUnitServiceArgs>) {
-        const unit = await Unit.findByIdAndDelete(_id).exec();
-
-        if ( !unit ) {
-            return { status: 404, body: { message: 'This unit no longer exist' } };
+        const candidate = await Unit.findById(_id).exec();
+        if (!candidate) {
+            return {
+                status: 404,
+                body: { message: 'Provided unit doesn`t exists' },
+            };
         }
 
-        await Chapter.findOneAndUpdate(
-            { units: unit._id },
-            {
-                $pullAll: { units: [unit._id] }
-            }
-        ).exec();
+        await candidate.remove();
 
         return { status: 200, body: { success: true } };
     }

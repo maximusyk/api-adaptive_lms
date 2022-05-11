@@ -1,10 +1,9 @@
-import { User } from './user.model';
 import bcrypt from 'bcrypt';
-import { Class } from '../classes/class.model';
-
-import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+import jwt from 'jsonwebtoken';
 import { IUser } from '../../types';
+import { Class } from '../classes/entities/class.entity';
+import { User } from './entities/user.entity';
 
 const jwtSecret = process.env.JWT_SECRET_KEY;
 
@@ -12,47 +11,58 @@ interface IUserService {
     login: {
         username: string;
         password: string;
-    },
+    };
     create: {
-        userData: IUser
-    },
-    getOne: {}
+        userData: IUser;
+    };
 }
 
 class UserService {
     async login({ username, password }: IUserService['login']) {
-        const candidate = await User.findOne({ $or: [{ username: username }, { email: username }] }).exec();
+        const candidate = await User.findOne({
+            $or: [{ username: username }, { email: username }],
+        }).exec();
 
-        if ( !candidate ) {
-            return { status: 404, body: { message: 'Current User does not exist' } };
+        if (!candidate) {
+            return {
+                status: 404,
+                body: { message: 'Current User does not exist' },
+            };
         }
 
         const isPassword = bcrypt.compareSync(password, candidate.password);
 
-        if ( !isPassword ) {
-            return { status: 401, body: { message: 'Incorrect password' } }
+        if (!isPassword) {
+            return { status: 401, body: { message: 'Incorrect password' } };
         }
 
-        const token = jwt.sign({ username, user_id: candidate._id, }, jwtSecret, { expiresIn: '1h' },);
+        const token = jwt.sign(
+            { username, user_id: candidate._id },
+            jwtSecret,
+            { expiresIn: '1h' },
+        );
 
-        return { status: 200, body: { token, id: candidate._id } }
-    };
+        return { status: 200, body: { token, id: candidate._id } };
+    }
 
     async create({ userData }: IUserService['create']) {
         const candidate = await User.findOne({
             username: userData.username,
-            email: userData.email
+            email: userData.email,
         }).exec();
 
-        if ( candidate ) {
-            return { status: 409, body: { message: 'Current username/email busy' } };
+        if (candidate) {
+            return {
+                status: 409,
+                body: { message: 'Current username/email busy' },
+            };
         }
 
         const salt = bcrypt.genSaltSync(10);
 
         const user = new User({
             ...userData,
-            password: bcrypt.hashSync(userData.password, salt)
+            password: bcrypt.hashSync(userData.password, salt),
         });
 
         await Class.updateOne(
@@ -88,7 +98,7 @@ class UserService {
     async getOne({ userData: { _id } }: IUserService['create']) {
         const user = await User.findById(_id).exec();
 
-        if ( !user ) {
+        if (!user) {
             return { status: 404, body: { messaage: 'User does not exist' } };
         }
 
@@ -102,13 +112,14 @@ class UserService {
 
     async remove({ userData: { _id } }: IUserService['create']) {
         const candidate = await User.findById(_id).exec();
-        if ( !candidate ) {
-            return { status: 404, body: { message: 'User does not exist' } };
+        if (!candidate) {
+            return {
+                status: 404,
+                body: { message: 'Provided user doesn`t exists' },
+            };
         }
-        if ( candidate.username === 'maksik' ) {
-            return { status: 423, body: { message: 'You are not allowed to delete this user' } };
-        }
-        await User.deleteOne({ _id }).exec();
+
+        await candidate.remove();
 
         return { status: 200, body: { success: true } };
     }
