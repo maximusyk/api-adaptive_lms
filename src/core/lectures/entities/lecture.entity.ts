@@ -25,7 +25,7 @@ const LectureSchema: Schema = new Schema({
     },
 });
 
-LectureSchema.pre(/(?i)(remove)|(delete)/, function (next) {
+LectureSchema.pre(/remove|[d,D]elete/, function (next) {
     this.model('chapters').update(
         { $in: { subdivisions: { item: this._id } } },
         { $pull: { subdivisions: { item: this._id } } },

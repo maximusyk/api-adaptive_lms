@@ -28,7 +28,7 @@ const ChapterSchema: Schema = new Schema(
     { strict: false },
 );
 
-ChapterSchema.pre(/(?i)(remove)|(delete)/, function (next) {
+ChapterSchema.pre(/remove|[d,D]elete/, function (next) {
     this.model('courses').update(
         { $in: { chapters: this._id } },
         { $pull: { chapters: this._id } },

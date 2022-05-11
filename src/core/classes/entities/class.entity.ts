@@ -20,7 +20,7 @@ const ClassSchema: Schema = new Schema({
     ],
 });
 
-ClassSchema.pre(/(?i)(remove)|(delete)/, function (next) {
+ClassSchema.pre(/remove|[d,D]elete/, function (next) {
     this.model('courses').update(
         { $in: { classes: this._id } },
         { $pull: { classes: this._id } },

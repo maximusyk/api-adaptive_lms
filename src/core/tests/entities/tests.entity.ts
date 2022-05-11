@@ -22,7 +22,7 @@ const TestSchema: Schema = new Schema({
     ],
 });
 
-TestSchema.pre(/(?i)(remove)|(delete)/, function (next) {
+TestSchema.pre(/remove|[d,D]elete/, function (next) {
     this.model('chapters').update(
         { $in: { subdivisions: { item: this._id } } },
         { $pull: { subdivisions: { item: this._id } } },

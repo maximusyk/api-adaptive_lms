@@ -35,7 +35,7 @@ const UnitSchema: Schema = new Schema({
     ],
 });
 
-UnitSchema.pre(/(?i)(remove)|(delete)/, function (next) {
+UnitSchema.pre(/remove|[d,D]elete/, function (next) {
     this.model('units').update(
         { $in: { connectivity: { unit: this._id } } },
         { $pull: { connectivity: { unit: this._id } } },

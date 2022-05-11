@@ -9,7 +9,7 @@ const KeywordSchema: Schema = new Schema({
     },
 });
 
-KeywordSchema.pre(/(?i)(remove)|(delete)/, function (next) {
+KeywordSchema.pre(/remove|[d,D]elete/, function (next) {
     this.model('units').update(
         { $in: { keywords: { item: this._id } } },
         { $pull: { keywords: { item: this._id } } },
