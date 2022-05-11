@@ -1,3 +1,5 @@
+import { Chapter } from 'core/chapters/entities/chapter.entity';
+import { Unit } from 'core/units/entities/unit.entity';
 import { model, Model, Schema, Types } from 'mongoose';
 import { ILecture } from '../../../types';
 
@@ -26,12 +28,13 @@ const LectureSchema: Schema = new Schema({
 });
 
 LectureSchema.pre(/remove|[d,D]elete/, function (next) {
-    this.model('chapters').update(
+    console.log('Removing lecture...');
+    Chapter.updateMany(
         { $in: { subdivisions: { item: this._id } } },
         { $pull: { subdivisions: { item: this._id } } },
         { multi: true },
     );
-    this.model('units').deleteMany({ chapter: this.chapter });
+    Unit.deleteMany({ chapter: this.chapter });
     next();
 });
 

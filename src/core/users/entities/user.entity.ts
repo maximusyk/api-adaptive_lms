@@ -1,3 +1,5 @@
+import { Class } from 'core/classes/entities/class.entity';
+import { Course } from 'core/courses/entities/course.entity';
 import { model, Model, Schema, Types } from 'mongoose';
 import { IUser } from '../../../types';
 
@@ -47,17 +49,17 @@ UserSchema.pre('save', function (next) {
     next();
 });
 UserSchema.pre('remove', function (next) {
-    this.model('classes').update(
+    Class.update(
         { $in: { students: this._id } },
         { $pull: { students: this._id } },
         { multi: true },
     );
-    this.model('courses').update(
+    Course.updateMany(
         { $in: { students: this._id } },
         { $pull: { students: this._id } },
         { multi: true },
     );
-    this.model('courses').update(
+    Course.updateMany(
         { $in: { instructor: this._id } },
         { $set: { instructor: '' } },
         { multi: true },

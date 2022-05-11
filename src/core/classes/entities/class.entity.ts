@@ -1,3 +1,5 @@
+import { Course } from 'core/courses/entities/course.entity';
+import { User } from 'core/users/entities/user.entity';
 import { model, Model, Schema, Types } from 'mongoose';
 import { IClass } from '../../../types';
 
@@ -21,12 +23,12 @@ const ClassSchema: Schema = new Schema({
 });
 
 ClassSchema.pre(/remove|[d,D]elete/, function (next) {
-    this.model('courses').update(
+    Course.update(
         { $in: { classes: this._id } },
         { $pull: { classes: this._id } },
         { multi: true },
     );
-    this.model('users').update(
+    User.update(
         { class: this._id },
         { $set: { class: null } },
         { multi: true },

@@ -1,3 +1,5 @@
+import { Lecture } from 'core/lectures/entities/lecture.entity';
+import { TestQuestion } from 'core/tests/entities/test-questions.entity';
 import { model, Model, Schema, Types } from 'mongoose';
 import { IUnit } from '../../../types';
 
@@ -36,17 +38,17 @@ const UnitSchema: Schema = new Schema({
 });
 
 UnitSchema.pre(/remove|[d,D]elete/, function (next) {
-    this.model('units').update(
+    this.model('units', UnitSchema).update(
         { $in: { connectivity: { unit: this._id } } },
         { $pull: { connectivity: { unit: this._id } } },
         { multi: true },
     );
-    this.model('lectures').update(
+    Lecture.updateMany(
         { $in: { units: this._id } },
         { $pull: { units: this._id } },
         { multi: true },
     );
-    this.model('test_questions').update(
+    TestQuestion.updateMany(
         { $in: { units: this._id } },
         { $pull: { units: this._id } },
         { multi: true },

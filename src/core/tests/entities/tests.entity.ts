@@ -1,5 +1,8 @@
+import { Chapter } from 'core/chapters/entities/chapter.entity';
 import { model, Model, Schema, Types } from 'mongoose';
 import { ITest } from '../../../types';
+import { TestAnswer } from './test-answers.entity';
+import { TestQuestion } from './test-questions.entity';
 
 const TestSchema: Schema = new Schema({
     title: {
@@ -23,13 +26,13 @@ const TestSchema: Schema = new Schema({
 });
 
 TestSchema.pre(/remove|[d,D]elete/, function (next) {
-    this.model('chapters').update(
+    Chapter.update(
         { $in: { subdivisions: { item: this._id } } },
         { $pull: { subdivisions: { item: this._id } } },
         { multi: true },
     );
-    this.model('test_answers').deleteMany({ test: this._id });
-    this.model('test_questions').deleteMany({ test: this._id });
+    TestAnswer.deleteMany({ test: this._id });
+    TestQuestion.deleteMany({ test: this._id });
     next();
 });
 

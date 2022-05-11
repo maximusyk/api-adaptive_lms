@@ -1,3 +1,4 @@
+import { Unit } from 'core/units/entities/unit.entity';
 import { model, Model, Schema } from 'mongoose';
 import { IKeyword } from '../../../types';
 
@@ -10,7 +11,7 @@ const KeywordSchema: Schema = new Schema({
 });
 
 KeywordSchema.pre(/remove|[d,D]elete/, function (next) {
-    this.model('units').update(
+    Unit.update(
         { $in: { keywords: { item: this._id } } },
         { $pull: { keywords: { item: this._id } } },
         { multi: true },

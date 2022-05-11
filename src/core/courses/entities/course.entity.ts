@@ -1,3 +1,6 @@
+import { Chapter } from 'core/chapters/entities/chapter.entity';
+import { Class } from 'core/classes/entities/class.entity';
+import { User } from 'core/users/entities/user.entity';
 import { model, Model, Schema, Types } from 'mongoose';
 import { ICourse } from '../../../types';
 
@@ -32,13 +35,13 @@ const CourseSchema: Schema = new Schema({
 });
 
 CourseSchema.pre(/remove|[d,D]elete/, function (next) {
-    this.model('chapters').deleteMany({ course: this._id });
-    this.model('class').update(
+    Chapter.deleteMany({ course: this._id });
+    Class.updateMany(
         { course: this._id },
         { $pull: { courses: this._id } },
         { multi: true },
     );
-    this.model('users').update(
+    User.updateMany(
         { $in: { progress: { course: this._id } } },
         { $pull: { progress: { course: this._id } } },
         { multi: true },
