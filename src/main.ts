@@ -14,10 +14,9 @@ async function start() {
   const configService = app.get(ConfigService);
 
   const config = new DocumentBuilder()
-  .setTitle("Adaptive LMS")
-  .setDescription("The Adaptive LMS API")
+  .setTitle("Coursuch API")
   .setVersion("1.0")
-  .addServer("http://localhost:" + configService.get("APP_PORT"), "FlexCare Local")
+  .addServer("http://localhost:" + configService.get("APP_PORT"), "Coursuch Local")
   .build();
 
   const document = SwaggerModule.createDocument(app, config);
