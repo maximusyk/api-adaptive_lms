@@ -27,10 +27,10 @@ export class QuizResults extends Model<QuizResults> {
 
   @ForeignKey(() => User)
   @Column({ type: DataType.UUID, allowNull: false })
-  userId: string;
+  studentId: string;
 
   @BelongsTo(() => User)
-  user: User;
+  student: User;
 
   @Column({ type: DataType.DATE, allowNull: false })
   createdAt: Date;
@@ -38,6 +38,6 @@ export class QuizResults extends Model<QuizResults> {
   @Column({ type: DataType.DATE, allowNull: false })
   updatedAt: Date;
 
-  @Column({ type: DataType.DATE, allowNull: false })
+  @Column({ type: DataType.DATE })
   deletedAt: Date;
 }

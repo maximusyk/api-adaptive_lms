@@ -34,7 +34,7 @@ export class Group extends Model<Group> {
   leader: User;
 
   @HasMany(() => User)
-  users: User[];
+  students: User[];
 
   @BelongsToMany(() => Course, () => GroupCourse)
   assignedCourses: Course[];
@@ -48,6 +48,6 @@ export class Group extends Model<Group> {
   @Column({ type: DataType.DATE, allowNull: false })
   updatedAt: Date;
 
-  @Column({ type: DataType.DATE, allowNull: false })
+  @Column({ type: DataType.DATE })
   deletedAt: Date;
 }

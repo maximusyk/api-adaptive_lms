@@ -54,6 +54,6 @@ export class Quiz extends Model<Quiz> {
   @Column({ type: DataType.DATE, allowNull: false })
   updatedAt: Date;
 
-  @Column({ type: DataType.DATE, allowNull: false })
+  @Column({ type: DataType.DATE })
   deletedAt: Date;
 }

@@ -48,15 +48,12 @@ export class User extends Model<User, CreateUserDto> {
   @BelongsTo(() => Group)
   group: Group;
 
-  @Column({ type: DataType.STRING, allowNull: false })
-  status: string;
-
   @Column({ type: DataType.DATE, allowNull: false })
   createdAt: Date;
 
   @Column({ type: DataType.DATE, allowNull: false })
   updatedAt: Date;
 
-  @Column({ type: DataType.DATE, allowNull: false })
+  @Column({ type: DataType.DATE })
   deletedAt: Date;
 }

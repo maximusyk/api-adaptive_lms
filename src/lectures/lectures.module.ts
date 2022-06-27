@@ -9,6 +9,7 @@ import { Lecture } from "./entities/lecture.entity";
     SequelizeModule.forFeature([ Lecture ])
   ],
   controllers: [ LecturesController ],
-  providers: [ LecturesService ]
+  providers: [ LecturesService ],
+  exports: [ LecturesService ]
 })
 export class LecturesModule {}

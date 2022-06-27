@@ -9,6 +9,7 @@ import { Token } from "./entities/token.entity";
     SequelizeModule.forFeature([ Token ])
   ],
   controllers: [ TokensController ],
-  providers: [ TokensService ]
+  providers: [ TokensService ],
+  exports: [ TokensService ]
 })
 export class TokensModule {}

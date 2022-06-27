@@ -3,12 +3,17 @@ import { UnitsService } from "./units.service";
 import { UnitsController } from "./units.controller";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { Unit } from "./entities/unit.entity";
+import { LecturesModule } from "../lectures/lectures.module";
+import { QuizzesModule } from "../quizzes/quizzes.module";
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([ Unit ])
+    SequelizeModule.forFeature([ Unit ]),
+    LecturesModule,
+    QuizzesModule
   ],
   controllers: [ UnitsController ],
-  providers: [ UnitsService ]
+  providers: [ UnitsService ],
+  exports: [ UnitsService ]
 })
 export class UnitsModule {}

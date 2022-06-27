@@ -20,7 +20,7 @@ export class Chapter extends Model<Chapter> {
   title: string;
 
   @HasMany(() => Lecture)
-  chapters: Lecture[];
+  lectures: Lecture[];
 
   @HasMany(() => Quiz)
   quizzes: Quiz[];
@@ -38,6 +38,6 @@ export class Chapter extends Model<Chapter> {
   @Column({ type: DataType.DATE, allowNull: false })
   updatedAt: Date;
 
-  @Column({ type: DataType.DATE, allowNull: false })
+  @Column({ type: DataType.DATE })
   deletedAt: Date;
 }

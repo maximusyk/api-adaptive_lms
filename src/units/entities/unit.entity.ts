@@ -1,4 +1,4 @@
-import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
+import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
 import { CreateUnitDto } from "../dto/units.dto";
 import { CohesionRate } from "./cohesion-rate.entity";
 import { Lecture } from "../../lectures/entities/lecture.entity";
@@ -23,9 +23,12 @@ export class Unit extends Model<Unit, CreateUnitDto> {
   @Column({ type: DataType.STRING, allowNull: false })
   content: string;
 
-  @HasMany(() => CohesionRate)
-  @Column({ type: DataType.UUID, allowNull: false })
+  @BelongsToMany(() => Unit, { through: () => CohesionRate, as: "assignedUnitId", foreignKey: "id" })
+  @Column({ type: DataType.UUID })
   cohesionRates: CohesionRate[];
+
+  @BelongsToMany(() => Unit, { through: () => CohesionRate, as: "cohesionUnitId", foreignKey: "id" })
+  unitsToCohesion: Unit[];
 
   @ForeignKey(() => Lecture)
   @Column({ type: DataType.UUID, allowNull: false })
@@ -47,6 +50,6 @@ export class Unit extends Model<Unit, CreateUnitDto> {
   @Column({ type: DataType.DATE, allowNull: false })
   updatedAt: Date;
 
-  @Column({ type: DataType.DATE, allowNull: false })
+  @Column({ type: DataType.DATE })
   deletedAt: Date;
 }

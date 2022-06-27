@@ -1,25 +1,61 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { CreateLectureDto, UpdateLectureDto } from "./dto/lectures.dto";
+import { InjectModel } from "@nestjs/sequelize";
+import { Lecture } from "./entities/lecture.entity";
 
 @Injectable()
 export class LecturesService {
-  create(createLectureDto: CreateLectureDto) {
-    return "This action adds a new lecture";
+  constructor(
+    @InjectModel(Lecture) private readonly lecturesRepository: typeof Lecture
+  ) {}
+
+  async create(createLectureDto: CreateLectureDto) {
+    try {
+      return this.lecturesRepository.create(createLectureDto, { include: { all: true } });
+    } catch ( error ) {
+      throw new HttpException(error.message, error?.status || HttpStatus.BAD_REQUEST);
+    }
   }
 
-  findAll() {
-    return `This action returns all lectures`;
+  async findAll() {
+    try {
+      return this.lecturesRepository.findAll({ include: { all: true } });
+    } catch ( error ) {
+      throw new HttpException(error.message, error?.status || HttpStatus.BAD_REQUEST);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${ id } lecture`;
+  async findOne(id: string) {
+    try {
+      return this.lecturesRepository.findByPk(id, { include: { all: true } });
+    } catch ( error ) {
+      throw new HttpException(error.message, error?.status || HttpStatus.BAD_REQUEST);
+    }
   }
 
-  update(id: number, updateLectureDto: UpdateLectureDto) {
-    return `This action updates a #${ id } lecture`;
+  async update(id: string, updateLectureDto: UpdateLectureDto) {
+    try {
+      return this.lecturesRepository.update(updateLectureDto, { where: { id } });
+    } catch ( error ) {
+      throw new HttpException(error.message, error?.status || HttpStatus.BAD_REQUEST);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${ id } lecture`;
+  async remove(id: string) {
+    try {
+      if ( !id ) {
+        throw new HttpException("id is required!", HttpStatus.BAD_REQUEST);
+      }
+      const chapter = await this.lecturesRepository.scope("withDeletedAt").findOne({ where: { id } });
+      if ( !chapter ) {
+        throw new HttpException("Chapter not found!", HttpStatus.NOT_FOUND);
+      }
+
+      await chapter.destroy();
+
+      return { statusCode: HttpStatus.OK, message: "Success!" };
+    } catch ( error ) {
+      throw new HttpException(error.message, error?.status || HttpStatus.BAD_REQUEST);
+    }
   }
 }

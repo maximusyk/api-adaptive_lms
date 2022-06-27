@@ -1,26 +1,26 @@
-import { Injectable } from '@nestjs/common';
-import { CreateKeywordDto } from './dto/create-keyword.dto';
-import { UpdateKeywordDto } from './dto/update-keyword.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateKeywordDto } from "./dto/create-keyword.dto";
+import { UpdateKeywordDto } from "./dto/update-keyword.dto";
 
 @Injectable()
 export class KeywordsService {
-  create(createKeywordDto: CreateKeywordDto) {
-    return 'This action adds a new keyword';
+  async create(createKeywordDto: CreateKeywordDto) {
+    return "This action adds a new keyword";
   }
 
-  findAll() {
+  async findAll() {
     return `This action returns all keywords`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} keyword`;
+  async findOne(id: string) {
+    return `This action returns a #${ id } keyword`;
   }
 
-  update(id: number, updateKeywordDto: UpdateKeywordDto) {
-    return `This action updates a #${id} keyword`;
+  async update(id: string, updateKeywordDto: UpdateKeywordDto) {
+    return `This action updates a #${ id } keyword`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} keyword`;
+  async remove(id: string) {
+    return `This action removes a #${ id } keyword`;
   }
 }

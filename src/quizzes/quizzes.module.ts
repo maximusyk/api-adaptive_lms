@@ -8,12 +8,17 @@ import { QuizQuestion } from "./entities/quiz-questions.entity";
 import { QuizQuestionType } from "./entities/quiz-question-types.entity";
 import { QuizConfig } from "./entities/quiz-config.entity";
 import { QuizResults } from "./entities/quiz-results.entity";
+import { CoursesModule } from "../courses/courses.module";
+import { ChaptersModule } from "../chapters/chapters.module";
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([ Quiz, QuizAnswer, QuizQuestion, QuizQuestionType, QuizConfig, QuizResults ])
+    SequelizeModule.forFeature([ Quiz, QuizAnswer, QuizQuestion, QuizQuestionType, QuizConfig, QuizResults ]),
+    CoursesModule,
+    ChaptersModule
   ],
   controllers: [ QuizzesController ],
-  providers: [ QuizzesService ]
+  providers: [ QuizzesService ],
+  exports: [ QuizzesService ]
 })
 export class QuizzesModule {}

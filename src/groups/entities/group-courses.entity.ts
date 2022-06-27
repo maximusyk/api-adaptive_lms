@@ -3,15 +3,15 @@ import { Group } from "./group.entity";
 import { Course } from "../../courses/entities/course.entity";
 
 @Table({
-  tableName: 'group_courses',
-  paranoid: true,
+  tableName: "group_courses",
+  paranoid: true
 })
 export class GroupCourse extends Model<GroupCourse> {
   @Column({
     type: DataType.UUID,
     unique: true,
     primaryKey: true,
-    defaultValue: DataType.UUIDV4,
+    defaultValue: DataType.UUIDV4
   })
   id: string;
 
@@ -35,6 +35,6 @@ export class GroupCourse extends Model<GroupCourse> {
   @Column({ type: DataType.DATE, allowNull: false })
   updatedAt: Date;
 
-  @Column({ type: DataType.DATE, allowNull: false })
+  @Column({ type: DataType.DATE })
   deletedAt: Date;
 }

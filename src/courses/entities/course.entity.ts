@@ -32,7 +32,7 @@ export class Course extends Model<Course> {
   // image: string;
 
   @ForeignKey(() => User)
-  @Column({ type: DataType.UUID, allowNull: false })
+  @Column({ type: DataType.UUID, allowNull: true })
   professorId: string;
 
   @BelongsTo(() => User)
@@ -53,6 +53,6 @@ export class Course extends Model<Course> {
   @Column({ type: DataType.DATE, allowNull: false })
   updatedAt: Date;
 
-  @Column({ type: DataType.DATE, allowNull: false })
+  @Column({ type: DataType.DATE })
   deletedAt: Date;
 }

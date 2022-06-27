@@ -16,10 +16,17 @@ export class CohesionRate extends Model<CohesionRate> {
 
   @ForeignKey(() => Unit)
   @Column({ type: DataType.UUID, allowNull: false })
-  unitId: string;
+  assignedUnitId: string;
 
   @BelongsTo(() => Unit)
-  unit: Unit;
+  assignedUnit: Unit;
+
+  @ForeignKey(() => Unit)
+  @Column({ type: DataType.UUID, allowNull: false })
+  cohesionUnitId: string;
+
+  @BelongsTo(() => Unit)
+  cohesionUnit: Unit;
 
   @Column({ type: DataType.INTEGER, allowNull: false })
   cohesionRate: number;
@@ -30,6 +37,6 @@ export class CohesionRate extends Model<CohesionRate> {
   @Column({ type: DataType.DATE, allowNull: false })
   updatedAt: Date;
 
-  @Column({ type: DataType.DATE, allowNull: false })
+  @Column({ type: DataType.DATE })
   deletedAt: Date;
 }
