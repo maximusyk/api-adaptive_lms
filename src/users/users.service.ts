@@ -76,7 +76,7 @@ export class UsersService {
         throw new HttpException("User not found!", HttpStatus.NOT_FOUND);
       }
 
-      if ( user.role.name !== role ) {
+      if ( user.role.title !== role ) {
         throw new HttpException("User does not have the required role!", HttpStatus.FORBIDDEN);
       }
 

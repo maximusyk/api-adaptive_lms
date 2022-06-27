@@ -1,0 +1,1 @@
+sleep 20 && npm run db:create:prod && npm run db:migrate:prod && npm run db:seed:all:prod && npm run start:prod

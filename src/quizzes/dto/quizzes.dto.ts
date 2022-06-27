@@ -174,9 +174,6 @@ export class QuizEntityDto {
   @ApiProperty({ type: () => QuizResultsEntityDto })
   quizResults: QuizResults[];
 
-  @ApiProperty()
-  courseId: string;
-
   @ApiProperty({ type: () => CourseEntityDto })
   course: Course;
 
@@ -206,11 +203,6 @@ export class CreateQuizDto {
   @IsUUID(4)
   @ApiProperty({ required: false })
   quizConfigId?: string;
-
-  @IsNotEmpty()
-  @IsUUID(4)
-  @ApiProperty()
-  courseId: string;
 
   @IsNotEmpty()
   @IsUUID(4)

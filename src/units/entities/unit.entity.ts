@@ -2,7 +2,6 @@ import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, Table } 
 import { CreateUnitDto } from "../dto/units.dto";
 import { CohesionRate } from "./cohesion-rate.entity";
 import { Lecture } from "../../lectures/entities/lecture.entity";
-import { QuizQuestion } from "../../quizzes/entities/quiz-questions.entity";
 
 @Table({
   tableName: "units",
@@ -24,7 +23,6 @@ export class Unit extends Model<Unit, CreateUnitDto> {
   content: string;
 
   @BelongsToMany(() => Unit, { through: () => CohesionRate, as: "assignedUnitId", foreignKey: "id" })
-  @Column({ type: DataType.UUID })
   cohesionRates: CohesionRate[];
 
   @BelongsToMany(() => Unit, { through: () => CohesionRate, as: "cohesionUnitId", foreignKey: "id" })
@@ -36,13 +34,6 @@ export class Unit extends Model<Unit, CreateUnitDto> {
 
   @BelongsTo(() => Lecture)
   lecture: Lecture;
-
-  @ForeignKey(() => QuizQuestion)
-  @Column({ type: DataType.UUID, allowNull: false })
-  quizQuestionId: string;
-
-  @BelongsTo(() => QuizQuestion)
-  quizQuestion: QuizQuestion;
 
   @Column({ type: DataType.DATE, allowNull: false })
   createdAt: Date;

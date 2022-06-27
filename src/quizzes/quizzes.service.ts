@@ -15,10 +15,6 @@ export class QuizzesService {
 
   async create(createQuizDto: CreateQuizDto) {
     try {
-      if ( !createQuizDto.courseId ) {
-        throw new HttpException("Course is required", HttpStatus.BAD_REQUEST);
-      }
-      await this.coursesService.findOne(createQuizDto.courseId);
       if ( !createQuizDto.chapterId ) {
         throw new HttpException("Chapter is required", HttpStatus.BAD_REQUEST);
       }

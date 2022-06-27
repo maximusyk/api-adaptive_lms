@@ -19,15 +19,15 @@ export class Chapter extends Model<Chapter> {
   @Column({ type: DataType.STRING, allowNull: false })
   title: string;
 
+  @ForeignKey(() => Course)
+  @Column({ type: DataType.UUID, allowNull: false })
+  courseId: string;
+
   @HasMany(() => Lecture)
   lectures: Lecture[];
 
   @HasMany(() => Quiz)
   quizzes: Quiz[];
-
-  @ForeignKey(() => Course)
-  @Column({ type: DataType.UUID, allowNull: false })
-  courseId: string;
 
   @BelongsTo(() => Course)
   course: Course;

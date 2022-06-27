@@ -1,4 +1,4 @@
-import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
+import { BelongsToMany, Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
 import { User } from "../../users/entities/user.entity";
 import { Course } from "../../courses/entities/course.entity";
 import { GroupCourse } from "./group-courses.entity";
@@ -18,20 +18,6 @@ export class Group extends Model<Group> {
 
   @Column({ type: DataType.STRING, allowNull: false })
   title: string;
-
-  @ForeignKey(() => User)
-  @Column({ type: DataType.UUID, allowNull: false })
-  curatorId: string;
-
-  @BelongsTo(() => User)
-  curator: User;
-
-  @ForeignKey(() => User)
-  @Column({ type: DataType.UUID, allowNull: false })
-  leaderId: string;
-
-  @BelongsTo(() => User)
-  leader: User;
 
   @HasMany(() => User)
   students: User[];
