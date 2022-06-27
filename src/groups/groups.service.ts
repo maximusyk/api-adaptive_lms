@@ -1,6 +1,5 @@
 import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { CreateGroupDto, UpdateGroupDto } from "./dto/groups.dto";
-import { RoleEnum } from "../roles/enums/role.enum";
 import { InjectModel } from "@nestjs/sequelize";
 import { Group } from "./entities/group.entity";
 import { UsersService } from "../users/users.service";
@@ -15,13 +14,6 @@ export class GroupsService {
 
   async create(createGroupDto: CreateGroupDto) {
     try {
-      if ( createGroupDto.curatorId ) {
-        await this.usersService.checkRole(createGroupDto.curatorId, RoleEnum.GROUP_CURATOR);
-      }
-      if ( createGroupDto.leaderId ) {
-        await this.usersService.checkRole(createGroupDto.leaderId, RoleEnum.GROUP_LEADER);
-      }
-
       return this.groupRepository.create(createGroupDto, { include: { all: true } });
     } catch ( error ) {
       throw new HttpException(error.message, error?.status || HttpStatus.BAD_REQUEST);
@@ -46,13 +38,6 @@ export class GroupsService {
 
   async update(id: string, updateGroupDto: UpdateGroupDto) {
     try {
-      if ( updateGroupDto.curatorId ) {
-        await this.usersService.checkRole(updateGroupDto.curatorId, RoleEnum.GROUP_CURATOR);
-      }
-      if ( updateGroupDto.leaderId ) {
-        await this.usersService.checkRole(updateGroupDto.leaderId, RoleEnum.GROUP_LEADER);
-      }
-
       return this.groupRepository.update(updateGroupDto, { where: { id } });
     } catch ( error ) {
       throw new HttpException(error.message, error?.status || HttpStatus.BAD_REQUEST);

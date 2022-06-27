@@ -61,8 +61,7 @@ import { GroupCourse } from "./groups/entities/group-courses.entity";
           CohesionRate,
           Unit,
           User
-        ],
-        autoLoadModels: true
+        ]
       })
     }),
     UsersModule,

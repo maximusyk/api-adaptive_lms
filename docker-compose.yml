@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  api:
+    container_name: adaptive_lms_api
+    image: adaptive_lms_api:1.0.0
+    restart: unless-stopped
+    build: .
+    entrypoint: sh docker-entrypoint.sh
+    ports:
+      - $APP_PORT:$APP_PORT
+    networks:
+      - adaptive-lms-network
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_HOST: postgres
+    links:
+      - postgres:postgres
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  postgres:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: $DATABASE_PASSWORD
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+networks:
+  adaptive-lms-network:
+    driver: bridge

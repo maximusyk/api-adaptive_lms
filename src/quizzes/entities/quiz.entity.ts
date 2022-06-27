@@ -1,5 +1,4 @@
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
-import { Course } from "../../courses/entities/course.entity";
 import { Chapter } from "../../chapters/entities/chapter.entity";
 import { QuizConfig } from "./quiz-config.entity";
 import { QuizResults } from "./quiz-results.entity";
@@ -22,7 +21,7 @@ export class Quiz extends Model<Quiz> {
   title: string;
 
   @ForeignKey(() => QuizConfig)
-  @Column({ type: DataType.UUID, allowNull: false })
+  @Column({ type: DataType.UUID })
   quizConfigId: string;
 
   @BelongsTo(() => QuizConfig)
@@ -33,13 +32,6 @@ export class Quiz extends Model<Quiz> {
 
   @HasMany(() => QuizResults)
   quizResults: QuizResults[];
-
-  @ForeignKey(() => Course)
-  @Column({ type: DataType.UUID, allowNull: false })
-  courseId: string;
-
-  @BelongsTo(() => Course)
-  course: Course;
 
   @ForeignKey(() => Chapter)
   @Column({ type: DataType.UUID, allowNull: false })

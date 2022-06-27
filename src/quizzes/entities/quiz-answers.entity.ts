@@ -1,5 +1,4 @@
 import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
-import { Quiz } from "./quiz.entity";
 import { QuizQuestion } from "./quiz-questions.entity";
 
 @Table({
@@ -27,13 +26,6 @@ export class QuizAnswer extends Model<QuizAnswer> {
 
   @BelongsTo(() => QuizQuestion)
   quizQuestion: QuizQuestion;
-
-  @ForeignKey(() => Quiz)
-  @Column({ type: DataType.UUID, allowNull: false })
-  quizId: string;
-
-  @BelongsTo(() => Quiz)
-  quiz: Quiz;
 
   @Column({ type: DataType.DATE, allowNull: false })
   createdAt: Date;

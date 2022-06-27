@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { User } from "../../users/entities/user.entity";
 import { UserEntityDto } from "../../users/dto/users.dto";
 import { CourseEntityDto } from "../../courses/dto/courses.dto";
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class GroupEntityDto {
   @ApiProperty()
@@ -10,18 +10,6 @@ export class GroupEntityDto {
 
   @ApiProperty()
   title: string;
-
-  @ApiProperty()
-  curatorId: string;
-
-  @ApiProperty({ type: () => UserEntityDto })
-  curator: User;
-
-  @ApiProperty()
-  leaderId: string;
-
-  @ApiProperty({ type: () => UserEntityDto })
-  leader: User;
 
   @ApiProperty({ type: () => UserEntityDto, isArray: true })
   students: User[];
@@ -45,16 +33,6 @@ export class CreateGroupDto {
   @ApiProperty()
   title: string;
 
-  @IsOptional()
-  @IsUUID(4)
-  @ApiProperty({ required: false })
-  curatorId?: string;
-
-  @IsOptional()
-  @IsUUID(4)
-  @ApiProperty({ required: false })
-  leaderId?: string;
-
   // @ApiProperty({ type: () => UserEntityDto, isArray: true })
   // students: User[];
   //
@@ -67,16 +45,6 @@ export class UpdateGroupDto {
   @IsString()
   @ApiProperty({ required: false })
   title?: string;
-
-  @IsOptional()
-  @IsUUID(4)
-  @ApiProperty({ required: false })
-  curatorId?: string;
-
-  @IsOptional()
-  @IsUUID(4)
-  @ApiProperty({ required: false })
-  leaderId?: string;
 
   // @ApiProperty({ type: () => UserEntityDto, isArray: true })
   // students: User[];

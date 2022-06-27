@@ -1,7 +1,7 @@
 import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 @Table({
-  tableName: "quiz_config",
+  tableName: "quiz_configs",
   paranoid: true
 })
 export class QuizConfig extends Model<QuizConfig> {
