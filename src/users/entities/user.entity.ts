@@ -44,7 +44,7 @@ export class User extends Model<User, CreateUserDto> {
     role: Role;
 
     @ForeignKey(() => Group)
-    @Column({ type: DataType.UUID, allowNull: false })
+    @Column({ type: DataType.UUID })
     groupId: string;
 
     @BelongsTo(() => Group)

@@ -1,7 +1,7 @@
 # API for Adaptime Learning Management System `<Coursuch/>`
 
 <p align="center">
-  <img src="https://i.ibb.co/YWmB7qV/Coursuch.png" alt="Coursuch" border="0">
+  <img src="https://i.ibb.co/xKZBrJw/Coursuch.png" alt="Coursuch" border="0">
 </p>
 
 ## Installation

@@ -1,5 +1,4 @@
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from 'sequelize-typescript';
-import { Unit } from '../../units/entities/unit.entity';
 import { Quiz } from './quiz.entity';
 import { QuizQuestionType } from './quiz-question-types.entity';
 import { QuizAnswer } from './quiz-answers.entity';
@@ -32,8 +31,8 @@ export class QuizQuestion extends Model<QuizQuestion> {
     @HasMany(() => QuizAnswer)
     answers: QuizAnswer[];
 
-    @HasMany(() => Unit)
-    connectedUnits: Unit[];
+    // @HasMany(() => Unit)
+    // connectedUnits: Unit[];
 
     @ForeignKey(() => Quiz)
     @Column({ type: DataType.UUID, allowNull: false })
