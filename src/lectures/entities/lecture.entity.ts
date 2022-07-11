@@ -5,8 +5,8 @@ import { Unit } from '../../units/entities/unit.entity';
 @Table({
     tableName: 'lectures',
     paranoid: true,
-    defaultScope: { attributes: { exclude: [ 'deletedAt' ] } },
-    scopes: { withDeletedAt: { attributes: { include: [ 'deletedAt' ] } } },
+    defaultScope: { attributes: { exclude: ['deletedAt'] } },
+    scopes: { withDeletedAt: { attributes: { include: ['deletedAt'] } } },
 })
 export class Lecture extends Model<Lecture> {
     @Column({
@@ -23,7 +23,7 @@ export class Lecture extends Model<Lecture> {
     @Column({ type: DataType.STRING, allowNull: false })
     fileId: string;
 
-    @Column({ type: DataType.BOOLEAN, allowNull: false })
+    @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
     isActive: boolean;
 
     @ForeignKey(() => Chapter)

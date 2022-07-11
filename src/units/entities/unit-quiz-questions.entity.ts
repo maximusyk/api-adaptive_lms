@@ -1,14 +1,14 @@
 import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript';
-import { Quiz } from './quiz.entity';
-import { User } from '../../users/entities/user.entity';
+import { Unit } from './unit.entity';
+import { QuizQuestion } from '../../quizzes/entities/quiz-questions.entity';
 
 @Table({
-    tableName: 'quiz_results',
+    tableName: 'unit_quiz_questions',
     paranoid: true,
     defaultScope: { attributes: { exclude: [ 'deletedAt' ] } },
     scopes: { withDeletedAt: { attributes: { include: [ 'deletedAt' ] } } }
 })
-export class QuizResult extends Model<QuizResult> {
+export class UnitQuizQuestions extends Model<UnitQuizQuestions> {
     @Column({
         type: DataType.UUID,
         unique: true,
@@ -17,22 +17,19 @@ export class QuizResult extends Model<QuizResult> {
     })
     id: string;
 
-    @Column({ type: DataType.DOUBLE, allowNull: false })
-    score: number;
-
-    @ForeignKey(() => Quiz)
+    @ForeignKey(() => Unit)
     @Column({ type: DataType.UUID, allowNull: false })
-    quizId: string;
+    unitId: string;
 
-    @BelongsTo(() => Quiz)
-    quiz: Quiz;
+    @BelongsTo(() => Unit)
+    unit: Unit;
 
-    @ForeignKey(() => User)
+    @ForeignKey(() => QuizQuestion)
     @Column({ type: DataType.UUID, allowNull: false })
-    studentId: string;
+    quizQuestionId: string;
 
-    @BelongsTo(() => User)
-    student: User;
+    @BelongsTo(() => QuizQuestion)
+    quizQuestion: QuizQuestion;
 
     @Column({ type: DataType.DATE, allowNull: false })
     createdAt: Date;

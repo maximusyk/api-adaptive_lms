@@ -1,5 +1,5 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUnitDto, UpdateUnitDto } from './dto/units.dto';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { CreateUnitDto, UnitEntityDto, UpdateUnitDto } from './dto/units.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Unit } from './entities/unit.entity';
 import { LecturesService } from '../lectures/lectures.service';
@@ -9,8 +9,9 @@ import { QuizzesService } from '../quizzes/quizzes.service';
 export class UnitsService {
     constructor(
         @InjectModel(Unit) private readonly unitsRepository: typeof Unit,
+        @Inject(forwardRef(() => LecturesService))
         private readonly lecturesService: LecturesService,
-        private readonly quizzesService: QuizzesService,
+        private readonly quizzesService: QuizzesService
     ) {}
 
     async create(createUnitDto: CreateUnitDto) {
@@ -19,12 +20,23 @@ export class UnitsService {
                 throw new HttpException('Lecture is required', HttpStatus.BAD_REQUEST);
             }
             await this.lecturesService.findOne(createUnitDto.lectureId);
-            // if ( createUnitDto.quizQuestionId ) {
-            //   // TODO: Refactor to find Question instead of the Quiz Instance
-            //   await this.quizzesService.findOne(createUnitDto.quizQuestionId);
-            // }
 
             return this.unitsRepository.create(createUnitDto, { include: { all: true } });
+        } catch ( error ) {
+            throw new HttpException(error.message, error?.status || HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    async createFromLectureContent(lectureId: string, content: string): Promise<void> {
+        try {
+            await this.lecturesService.findOne(lectureId);
+
+            if ( !content ) throw new HttpException('Content is required!', HttpStatus.BAD_REQUEST);
+            if ( !content.length ) throw new HttpException('Content is empty!', HttpStatus.BAD_REQUEST);
+
+            const preparedUnits = this.prepareUnitsFromLecture(lectureId, content);
+
+            await this.unitsRepository.bulkCreate(preparedUnits);
         } catch ( error ) {
             throw new HttpException(error.message, error?.status || HttpStatus.BAD_REQUEST);
         }
@@ -41,6 +53,14 @@ export class UnitsService {
     async findOne(id: string) {
         try {
             return this.unitsRepository.findByPk(id, { include: { all: true } });
+        } catch ( error ) {
+            throw new HttpException(error.message, error?.status || HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    async findByLectureId(id: string) {
+        try {
+            return this.unitsRepository.findOne({ where: { lectureId: id }, include: { all: true } });
         } catch ( error ) {
             throw new HttpException(error.message, error?.status || HttpStatus.BAD_REQUEST);
         }
@@ -80,5 +100,25 @@ export class UnitsService {
         } catch ( error ) {
             throw new HttpException(error.message, error?.status || HttpStatus.BAD_REQUEST);
         }
+    }
+
+    prepareUnitsFromLecture(lectureId: string, lectureContent: string): Pick<UnitEntityDto, 'title' | 'content' | 'lectureId'>[] {
+        const domParser = new DOMParser();
+        const htmlBody = domParser.parseFromString(lectureContent, 'text/html').body as HTMLBodyElement;
+        const unitsContent = Array.from(htmlBody.children).map((child) => child.outerHTML).filter(Boolean);
+
+        const preparedUnits: Pick<UnitEntityDto, 'title' | 'content' | 'lectureId'>[] = [];
+
+        unitsContent.forEach((unitContent) => {
+            const unitTitle = unitContent.match(/(\S+\s+\S+|\S+)/)?.at(1)?.replace(/\s+/g, ' ')?.trim();
+            const unit = {
+                title: `Unit ${ unitTitle }`,
+                content: unitContent,
+                lectureId: lectureId
+            };
+            preparedUnits.push(unit);
+        });
+
+        return preparedUnits;
     }
 }

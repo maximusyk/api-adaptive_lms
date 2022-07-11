@@ -46,7 +46,7 @@ export class AuthService {
         try {
             const hashedPassword = await this.hashData(signupData.password);
 
-            const user = await this.usersService.create({ ...signupData, password: hashedPassword });
+            const user = await this.usersService.create({ ...signupData, hashedPassword });
 
             const signedTokens = await this.signTokens(user.id, user.email, user.role.title);
 

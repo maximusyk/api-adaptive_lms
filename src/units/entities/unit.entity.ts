@@ -7,14 +7,14 @@ import { Lecture } from '../../lectures/entities/lecture.entity';
     tableName: 'units',
     paranoid: true,
     defaultScope: { attributes: { exclude: [ 'deletedAt' ] } },
-    scopes: { withDeletedAt: { attributes: { include: [ 'deletedAt' ] } } },
+    scopes: { withDeletedAt: { attributes: { include: [ 'deletedAt' ] } } }
 })
 export class Unit extends Model<Unit, CreateUnitDto> {
     @Column({
         type: DataType.UUID,
         unique: true,
         primaryKey: true,
-        defaultValue: DataType.UUIDV4,
+        defaultValue: DataType.UUIDV4
     })
     id: string;
 

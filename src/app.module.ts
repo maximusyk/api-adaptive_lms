@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from './users/users.module';
-import { UnitsModule } from './units/units.module';
 import { TokensModule } from './tokens/tokens.module';
 import { QuizzesModule } from './quizzes/quizzes.module';
 import { LecturesModule } from './lectures/lectures.module';
+import { UnitsModule } from './units/units.module';
 import { ChaptersModule } from './chapters/chapters.module';
 import { GroupsModule } from './groups/groups.module';
 import { CoursesModule } from './courses/courses.module';
@@ -21,13 +20,15 @@ import { QuizAnswer } from './quizzes/entities/quiz-answers.entity';
 import { QuizQuestion } from './quizzes/entities/quiz-questions.entity';
 import { QuizQuestionType } from './quizzes/entities/quiz-question-types.entity';
 import { QuizConfig } from './quizzes/entities/quiz-config.entity';
-import { QuizResults } from './quizzes/entities/quiz-results.entity';
+import { QuizResult } from './quizzes/entities/quiz-results.entity';
 import { Role } from './roles/entities/role.entity';
 import { UserRoles } from './roles/entities/user-roles.entity';
 import { Token } from './tokens/entities/token.entity';
 import { CohesionRate } from './units/entities/cohesion-rate.entity';
 import { Unit } from './units/entities/unit.entity';
 import { User } from './users/entities/user.entity';
+import { UsersModule } from './users/users.module';
+import { AwsService } from './aws/aws.service';
 
 // TODO: Add nestjs-i18n support
 
@@ -55,15 +56,15 @@ import { User } from './users/entities/user.entity';
                     QuizQuestion,
                     QuizQuestionType,
                     QuizConfig,
-                    QuizResults,
+                    QuizResult,
                     Role,
                     UserRoles,
                     Token,
                     CohesionRate,
                     Unit,
-                    User,
-                ],
-            }),
+                    User
+                ]
+            })
         }),
         UsersModule,
         RolesModule,
@@ -76,10 +77,10 @@ import { User } from './users/entities/user.entity';
         QuizzesModule,
         TokensModule,
         UnitsModule,
-        AuthModule,
+        AuthModule
     ],
     controllers: [],
-    providers: [],
-    exports: [],
+    providers: [ AwsService ],
+    exports: []
 })
 export class AppModule {}

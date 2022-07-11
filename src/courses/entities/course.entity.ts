@@ -7,8 +7,8 @@ import { GroupCourse } from '../../groups/entities/group-courses.entity';
 @Table({
     tableName: 'courses',
     paranoid: true,
-    defaultScope: { attributes: { exclude: [ 'deletedAt' ] } },
-    scopes: { withDeletedAt: { attributes: { include: [ 'deletedAt' ] } } },
+    defaultScope: { attributes: { exclude: ['deletedAt'] } },
+    scopes: { withDeletedAt: { attributes: { include: ['deletedAt'] } } },
 })
 export class Course extends Model<Course> {
     @Column({
@@ -22,7 +22,7 @@ export class Course extends Model<Course> {
     @Column({ type: DataType.STRING, allowNull: false })
     title: string;
 
-    @Column({ type: DataType.STRING, allowNull: false })
+    @Column({ type: DataType.STRING })
     description: string;
 
     // TODO: Implement Category Entity
