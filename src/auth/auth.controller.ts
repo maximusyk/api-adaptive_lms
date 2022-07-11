@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/users.dto';
 import { AuthTokensDto, SigninLocalDto } from './dto/auth.dto';
@@ -18,11 +18,25 @@ export class AuthController {
         private readonly authService: AuthService,
     ) {}
 
+    @ApiResponse(
+        {
+            status: 200,
+            type: AuthTokensDto,
+            description: 'User successfully registered and signed in',
+        },
+    )
     @Post('/local/signup')
     signupLocal(@Body() signupData: CreateUserDto): Promise<AuthTokensDto> {
         return this.authService.signupLocal(signupData);
     }
 
+    @ApiResponse(
+        {
+            status: 200,
+            type: AuthTokensDto,
+            description: 'User successfully signed in',
+        },
+    )
     @Post('/local/signin')
     async signinLocal(@Body() signinData: SigninLocalDto, @Res({ passthrough: true }) response: Response): Promise<AuthTokensDto> {
         const tokens = await this.authService.signinLocal(signinData);
@@ -34,13 +48,28 @@ export class AuthController {
         return tokens;
     }
 
-    @AuthAccess()
+    @ApiResponse(
+        {
+            status: 200,
+            description: 'User successfully logged out',
+        },
+    )
+    @ApiBearerAuth()
+    @AuthAccess([])
     @Post('/logout')
     async logout(@GetCurrentUser() user: JwtAccessPayload, @Res({ passthrough: true }) response: Response): Promise<void> {
         await this.authService.logout(user.sub);
         response.clearCookie('refreshToken');
     }
 
+    @ApiResponse(
+        {
+            status: 200,
+            type: AuthTokensDto,
+            description: 'User tokens successfully refreshed',
+        },
+    )
+    @ApiBearerAuth()
     @AuthRefresh()
     @Post('/refresh')
     async refreshTokens(@GetCurrentUser() user: JwtRefreshPayload, @Res({ passthrough: true }) response: Response): Promise<AuthTokensDto> {

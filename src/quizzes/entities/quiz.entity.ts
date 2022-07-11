@@ -1,21 +1,21 @@
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from 'sequelize-typescript';
 import { Chapter } from '../../chapters/entities/chapter.entity';
 import { QuizConfig } from './quiz-config.entity';
-import { QuizResults } from './quiz-results.entity';
+import { QuizResult } from './quiz-results.entity';
 import { QuizQuestion } from './quiz-questions.entity';
 
 @Table({
     tableName: 'quizzes',
     paranoid: true,
     defaultScope: { attributes: { exclude: [ 'deletedAt' ] } },
-    scopes: { withDeletedAt: { attributes: { include: [ 'deletedAt' ] } } },
+    scopes: { withDeletedAt: { attributes: { include: [ 'deletedAt' ] } } }
 })
 export class Quiz extends Model<Quiz> {
     @Column({
         type: DataType.UUID,
         unique: true,
         primaryKey: true,
-        defaultValue: DataType.UUIDV4,
+        defaultValue: DataType.UUIDV4
     })
     id: string;
 
@@ -32,8 +32,8 @@ export class Quiz extends Model<Quiz> {
     @HasMany(() => QuizQuestion)
     quizQuestions: QuizQuestion[];
 
-    @HasMany(() => QuizResults)
-    quizResults: QuizResults[];
+    @HasMany(() => QuizResult)
+    quizResults: QuizResult[];
 
     @ForeignKey(() => Chapter)
     @Column({ type: DataType.UUID, allowNull: false })

@@ -7,41 +7,45 @@ module.exports = {
             const transitionHost = { transaction };
             return Promise.all([
                 queryInterface.createTable(
-                    'courses',
+                    'unit_quiz_questions',
                     {
                         id: {
                             type: DataType.UUID,
                             unique: true,
                             primaryKey: true,
-                            defaultValue: DataType.UUIDV4,
+                            defaultValue: DataType.UUIDV4
                         },
-                        title: {
-                            type: DataType.STRING,
-                            allowNull: false,
-                        },
-                        description: {
-                            type: DataType.STRING,
-                        },
-                        professorId: {
+                        unitId: {
                             type: DataType.UUID,
+                            allowNull: false,
                             references: {
-                                model: 'users',
-                                key: 'id',
-                            },
+                                model: 'units',
+                                key: 'id'
+                            }
+                        },
+                        quizQuestionId: {
+                            type: DataType.UUID,
+                            allowNull: false,
+                            references: {
+                                model: 'quiz_questions',
+                                key: 'id'
+                            }
                         },
                         createdAt: {
-                            type: Sequelize.DATE,
+                            type: DataType.DATE,
+                            allowNull: false
                         },
                         updatedAt: {
-                            type: Sequelize.DATE,
+                            type: DataType.DATE,
+                            allowNull: false
                         },
                         deletedAt: {
-                            type: Sequelize.DATE,
-                        },
+                            type: DataType.DATE
+                        }
                     }
                     ,
-                    transitionHost,
-                ),
+                    transitionHost
+                )
             ]);
         });
     },
@@ -50,8 +54,8 @@ module.exports = {
         return queryInterface.sequelize.transaction((transaction) => {
             const transitionHost = { transaction };
             return Promise.all([
-                queryInterface.dropTable('courses', transitionHost),
+                queryInterface.dropTable('unit_quiz_questions', transitionHost)
             ]);
         });
-    },
+    }
 };
